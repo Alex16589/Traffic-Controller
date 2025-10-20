@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequential Traffic Controller</title>
+<style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 { margin-bottom: 30px; }
+
+  .intersection {
+    display: grid;
+    grid-template-columns: repeat(2, 200px);
+    grid-gap: 40px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .signal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background: #222;
+    padding: 15px;
+    border-radius: 15px;
+    width: 100px;
+    height: 250px;
+    box-shadow: 0 0 15px #000;
+  }
+
+  .light {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    border-radius: 50%;
+    background: #333;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+
+  .on.red { background: red; box-shadow: 0 0 25px red; }
+  .on.yellow { background: yellow; box-shadow: 0 0 25px yellow; }
+  .on.green { background: limegreen; box-shadow: 0 0 25px limegreen; }
+
+  .label { margin-top: 8px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Sequential Traffic Controller</h1>
+
+<div class="intersection">
+  <div class="signal" id="north">
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="label">NORTH</div>
+  </div>
+  <div class="signal" id="east">
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="label">EAST</div>
+  </div>
+  <div class="signal" id="west">
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="label">WEST</div>
+  </div>
+  <div class="signal" id="south">
+    <div class="light red"></div>
+    <div class="light yellow"></div>
+    <div class="light green"></div>
+    <div class="label">SOUTH</div>
+  </div>
+</div>
+
+<<script>
+  function setSignal(id, color) {
+    const signal = document.getElementById(id);
+    signal.querySelectorAll('.light').forEach(l => l.classList.remove('on'));
+    if (color === 'red') signal.querySelector('.red').classList.add('on');
+    if (color === 'yellow') signal.querySelector('.yellow').classList.add('on');
+    if (color === 'green') signal.querySelector('.green').classList.add('on');
+  }
+
+  async function updateFromServer() {
+    const res = await fetch('/state');
+    const data = await res.json();
+    for (const dir in data) {
+      setSignal(dir, data[dir]);
+    }
+  }
+
+  setInterval(updateFromServer, 500);
+</script>
+
+</body>
+</html>
